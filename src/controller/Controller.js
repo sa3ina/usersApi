@@ -1,8 +1,8 @@
 const User = require("../models/Models");
 const jwt = require("jsonwebtoken");
+
 const login = async (req, res) => {
   const user = req.body;
-  // console.log(user);
 
   try {
     let findUser = await User.findOne({ username: user.username });
@@ -12,10 +12,11 @@ const login = async (req, res) => {
         { password: user.password, username: user.username },
         process.env.SECRET_TOKEN,
         {
-          expiresIn: "60s",
+          expiresIn: "2s",
         }
       );
       console.log("token", token);
+      console.log("salammm");
 
       return res.status(200).send(token);
     } else {
@@ -53,9 +54,7 @@ const postUser = async (req, res) => {
       return res.status(201).send("this email is already used");
     }
     {
-      // console.log(req.body);
       const newUser = new User(req.body);
-      // console.log(newUser);
       newUser.save();
 
       res.status(200).send({
