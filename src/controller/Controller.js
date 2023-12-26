@@ -1,4 +1,33 @@
 const User = require("../models/Models");
+const jwt = require("jsonwebtoken");
+const login = async (req, res) => {
+  const user = req.body;
+  // console.log(user);
+
+  try {
+    let findUser = await User.findOne({ username: user.username });
+
+    if (findUser) {
+      const token = jwt.sign(
+        { password: user.password, username: user.username },
+        process.env.SECRET_TOKEN,
+        {
+          expiresIn: "60s",
+        }
+      );
+      console.log("token", token);
+
+      return res.status(200).send(token);
+    } else {
+      return res.status(201).send("please enter correct info");
+    }
+  } catch {
+    (err) => {
+      console.log(err);
+      return err;
+    };
+  }
+};
 const getAll = async (req, res) => {
   const posts = await User.find();
   res.send(posts);
@@ -12,9 +41,33 @@ const deleteUser = async (req, res) => {
   res.status(204).send();
 };
 const postUser = async (req, res) => {
-  const post = new User(req.body);
-  await post.save();
-  res.send(post);
+  const user = req.body;
+
+  try {
+    let findUserByName = await User.findOne({ username: user.username });
+    let findUserByEmail = await User.findOne({ username: user.email });
+    if (findUserByName) {
+      return res.status(201).send("this username is already taken");
+    }
+    if (findUserByEmail) {
+      return res.status(201).send("this email is already used");
+    }
+    {
+      // console.log(req.body);
+      const newUser = new User(req.body);
+      // console.log(newUser);
+      newUser.save();
+
+      res.status(200).send({
+        message: "succesfull registration",
+      });
+    }
+  } catch {
+    (err) => {
+      console.log(err);
+      return err;
+    };
+  }
 };
 const patchUser = async (req, res) => {
   let id = req.params.id;
@@ -31,4 +84,5 @@ module.exports = {
   postUser,
   patchUser,
   putUser,
+  login,
 };

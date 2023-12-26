@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const userAuth = require("../middleware/userAuth");
 const Controller = require("../controller/Controller");
 router.get("/users", Controller.getAll);
 router.get("/users/:id", Controller.getById);
@@ -7,4 +8,6 @@ router.delete("/users/:id", Controller.deleteUser);
 router.post("/users", Controller.postUser);
 router.patch("/users/:id", Controller.patchUser);
 router.put("/users/:id", Controller.putUser);
+router.post("/login", Controller.login);
+router.get("/home", userAuth, Controller.getAll);
 module.exports = router;
